@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+ 	  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd       
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd       
+      http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.0.xsd       
+      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+
+	<!-- 注解扫描 -->
+	<context:component-scan base-package="com.mints"></context:component-scan>
+
+	<!-- 加载JDBC信息 -->
+	<!-- 如果有多个配置文件，使用,进行分割，例如classpath:jdbc/jdbc1.properties,classpath:jdbc/jdbc2.properties 
+		也可使用 <bean id="jdbcProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> 
+				<property name="locations"> 
+					<list> 
+						<value>classpath*:/spring/jdbc.properties</value> 
+						<value>... 
+					</list> 
+				</property> 
+			 </bean> -->
+	<context:property-placeholder location="classpath:jdbc/jdbc.properties" />
+
+	<!-- 配置Druid数据连接池 可参考http://blog.csdn.net/freewindgo/article/details/53994072 -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+		destroy-method="close">
+		<!-- 数据库基本信息配置 -->
+		<property name="url" value="${jdbc.url}"></property>
+		<property name="username" value="${jdbc.username}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+		<property name="driverClassName" value="${jdbc.driverClassName}"></property>
+		<!-- 初始连接数配置 -->
+		<property name="initialSize" value="${initialSize}"></property>
+		<!-- 最大连接池数量 -->
+		<property name="maxActive" value="${maxActive}"></property>
+		<!-- 最小连接池数量 -->
+		<property name="minIdle" value="${minIdle}"></property>
+		<!-- 配置获取连接等待超时的时间 ，单位是毫秒 -->
+		<property name="maxWait" value="${maxWait}"></property>
+		<!-- 申请连接时进行检测，增加安全性 -->
+		<property name="testWhileIdle" value="${testWhileIdle}"></property>
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		<property name="timeBetweenEvictionRunsMillis" value="${timeBetweenEvictionRunsMillis}" />
+		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property name="minEvictableIdleTimeMillis" value="${minEvictableIdleTimeMillis}" />
+		<!-- 监控统计用插件 -->
+		<property name="filters" value="stat" />
+	</bean>
+	
+	<!-- 配置Mybatis与Spring整合 -->
+	<bean id="sessionFactory" class="org.mybatis.spring.SqlSessionfactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		 <!-- 自动扫描mapping.xml文件 -->
+		<property name="mapperLocation" value="classpath:com/mints/*.xml"></property>
+	</bean>
+	
+	
+	
+
+
+
+
+
+
+
+
+
+</beans>

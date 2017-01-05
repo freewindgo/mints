@@ -42,7 +42,6 @@
 			<scope>runtime</scope>
 		</dependency>
 
-
 		<!-- Spring依赖 -->
 		<!--1)spring核心依赖 -->
 		<dependency>
@@ -114,7 +113,7 @@
 			<version>${springsecurity.version}</version>
 			<scope>runtime</scope>
 		</dependency>
-		
+
 		<!-- 引入mybatis依赖坐标 -->
 		<dependency>
 			<groupId>org.mybatis</groupId>
@@ -143,12 +142,24 @@
 			<version>5.1.32</version>
 		</dependency>
 
-		<!-- 数据库连接池的包 -->
+		<!-- 数据库连接池,使用druid -->
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-dbcp2</artifactId>
-			<version>2.1.1</version>
-			<scope>runtime</scope>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid</artifactId>
+			<version>1.0.27</version>
+		</dependency>
+
+		<!-- JSON相关 -->
+		<dependency>
+			<groupId>net.sf.json-lib</groupId>
+			<artifactId>json-lib</artifactId>
+			<version>2.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sf.flexjson</groupId>
+			<artifactId>flexjson</artifactId>
+			<version>3.3</version>
 		</dependency>
 	</dependencies>
 	<build>
