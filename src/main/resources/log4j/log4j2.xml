@@ -7,7 +7,7 @@
 	
     <Properties>
         <!-- 配置日志文件输出目录 -->
-        <Property name="LOG_HOME">F:\mints\logs</Property>
+        <Property name="LOG_HOME">${webName.root}/WEB-INF/logs</Property>
     </Properties>
 
     <Appenders>

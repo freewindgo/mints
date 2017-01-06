@@ -8,9 +8,13 @@
       http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.0.xsd       
       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
 
-
-	<!-- 注解扫描 -->
-	<context:component-scan base-package="com.mints"></context:component-scan>
+	<!-- 启用注解 -->
+	<context:annotation-config />
+	
+	<!-- 组件扫描,排除@Controller组件，该组件由SpringMVC配置文件扫描-->
+	<context:component-scan base-package="com.mints">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
 
 	<!-- 加载JDBC信息 -->
 	<!-- 如果有多个配置文件，使用,进行分割，例如classpath:jdbc/jdbc1.properties,classpath:jdbc/jdbc2.properties 
@@ -54,18 +58,8 @@
 	<bean id="sessionFactory" class="org.mybatis.spring.SqlSessionfactoryBean">
 		<property name="dataSource" ref="dataSource"></property>
 		 <!-- 自动扫描mapping.xml文件 -->
-		<property name="mapperLocation" value="classpath:com/mints/*.xml"></property>
+		<property name="mapperLocation" value="classpath:mybatis/*.xml"></property>
 	</bean>
 	
-	
-	
-
-
-
-
-
-
-
-
 
 </beans>
