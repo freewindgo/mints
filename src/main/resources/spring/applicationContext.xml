@@ -2,30 +2,29 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
 	xsi:schemaLocation="
  	  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd       
       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd       
       http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.0.xsd       
-      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+      http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
 
 	<!-- 启用注解 -->
 	<context:annotation-config />
-	
-	<!-- 组件扫描,排除@Controller组件，该组件由SpringMVC配置文件扫描-->
-	<context:component-scan base-package="com.mints">
-		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+
+	<!-- 组件扫描,排除@Controller组件，该组件由SpringMVC配置文件扫描，为提高初始化速度，只扫描dao，service serviceimpl -->
+	<context:component-scan
+		base-package="com.mints.**.dao,com.mints.**.serviceimpl,com.mints.**.service">
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
 	</context:component-scan>
 
 	<!-- 加载JDBC信息 -->
 	<!-- 如果有多个配置文件，使用,进行分割，例如classpath:jdbc/jdbc1.properties,classpath:jdbc/jdbc2.properties 
 		也可使用 <bean id="jdbcProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> 
-				<property name="locations"> 
-					<list> 
-						<value>classpath*:/spring/jdbc.properties</value> 
-						<value>... 
-					</list> 
-				</property> 
-			 </bean> -->
+		<property name="locations"> <list> <value>classpath*:/spring/jdbc.properties</value> 
+		<value>... </list> </property> </bean> -->
 	<context:property-placeholder location="classpath:jdbc/jdbc.properties" />
 
 	<!-- 配置Druid数据连接池 可参考http://blog.csdn.net/freewindgo/article/details/53994072 -->
@@ -53,13 +52,47 @@
 		<!-- 监控统计用插件 -->
 		<property name="filters" value="stat" />
 	</bean>
-	
+
 	<!-- 配置Mybatis与Spring整合 -->
 	<bean id="sessionFactory" class="org.mybatis.spring.SqlSessionfactoryBean">
 		<property name="dataSource" ref="dataSource"></property>
-		 <!-- 自动扫描mapping.xml文件 -->
+		<!-- 自动扫描mapping.xml文件 -->
 		<property name="mapperLocation" value="classpath:mybatis/*.xml"></property>
 	</bean>
+
+	<!-- 配置Mabatis的Dao扫描,如果使用了多数据源，需配置SqlSessionFactory -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.mints.**.mapper" />
+	</bean>
+
+	<!-- 开启aspectj支持 -->
+	<aop:aspectj-autoproxy proxy-target-class="true"/>
 	
+	<!-- 事务管理配置 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	<!-- 事务切入点配置 -->
+	<aop:config>
+		<aop:pointcut expression="execution(* com.mints.**.service..*(..))" id="txManager"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txManager"/>
+	</aop:config>
+	
+	<!-- 事务通知配置，对delete和saveOrUpdate方法进行监听 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="delete*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception"/>
+			<tx:method name="saveOrUpdate*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception"/>
+		</tx:attributes>
+	</tx:advice>
+	
+	<!-- 开启事务注解Transactional -->
+	<tx:annotation-driven/>
+	
+
+
+
 
 </beans>

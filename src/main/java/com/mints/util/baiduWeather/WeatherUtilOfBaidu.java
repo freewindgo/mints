@@ -1,4 +1,4 @@
-package com.mints.util.weather;
+package com.mints.util.baiduWeather;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -9,13 +9,13 @@ import java.net.URLEncoder;
 import java.util.Date;
 import java.util.Properties;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
+import link.jfire.codejson.JsonArray;
+import link.jfire.codejson.JsonObject;
+
+
 
 /**
- * 百度天气util 从json转为天气类
- * 
+ * 百度天气util 从json转为天气类,尝试使用codeJson进行处理
  * @author Justin
  * @date 2016年12月13日
  */
@@ -64,7 +64,7 @@ public class WeatherUtilOfBaidu {
 	@SuppressWarnings("deprecation")
 	public static WeatherInf resolveWeatherInf(String strPar) {
 
-		JSONObject dataOfJson = JSONObject.fromObject(strPar);
+		JsonObject dataOfJson = new JsonObject().getJsonObject(strPar);
 
 		if (dataOfJson.getInt("error") != 0) {
 			return null;
@@ -73,20 +73,20 @@ public class WeatherUtilOfBaidu {
 		// 保存全部的天气信息。
 		WeatherInf weatherInf = new WeatherInf();
 
-		// 从json数据中取得的时间�?
-		String date = dataOfJson.getString("date");
+		// 从json数据中取得的时间
+		String date = dataOfJson.getWString("date");
 		int year = Integer.parseInt(date.substring(0, 4));
 		int month = Integer.parseInt(date.substring(5, 7));
 		int day = Integer.parseInt(date.substring(8, 10));
 		Date today = new Date(year - 1900, month - 1, day);
 
-		JSONArray results = dataOfJson.getJSONArray("results");
-		JSONObject results0 = results.getJSONObject(0);
+		JsonArray results = dataOfJson.getJsonArray("results");
+		JsonObject results0 = results.getJsonObject(0);
 
-		String location = results0.getString("currentCity");
+		String location = results0.getWString("currentCity");
 		int pmTwoPointFive;
 
-		if (results0.getString("pm25").isEmpty()) {
+		if (results0.getWString("pm25").isEmpty()) {
 			pmTwoPointFive = 0;
 		} else {
 			pmTwoPointFive = results0.getInt("pm25");
@@ -95,24 +95,24 @@ public class WeatherUtilOfBaidu {
 
 		try {
 
-			JSONArray index = results0.getJSONArray("index");
-			JSONObject index0 = index.getJSONObject(0);// 穿衣
-			JSONObject index1 = index.getJSONObject(1);// 洗车
-			JSONObject index2 = index.getJSONObject(2);// 感冒
-			JSONObject index3 = index.getJSONObject(3);// 运动
-			JSONObject index4 = index.getJSONObject(4);// 紫外线强度
-			String dressAdvise = index0.getString("des");// 穿衣建议
-			String washCarAdvise = index1.getString("des");// 洗车建议
-			String coldAdvise = index2.getString("des");// 感冒建议
-			String sportsAdvise = index3.getString("des");// 运动建议
-			String ultravioletRaysAdvise = index4.getString("des");// 紫外线建议
+			JsonArray index = results0.getJsonArray("index");
+			JsonObject index0 = index.getJsonObject(0);// 穿衣
+			JsonObject index1 = index.getJsonObject(1);// 洗车
+			JsonObject index2 = index.getJsonObject(2);// 感冒
+			JsonObject index3 = index.getJsonObject(3);// 运动
+			JsonObject index4 = index.getJsonObject(4);// 紫外线强度
+			String dressAdvise = index0.getWString("des");// 穿衣建议
+			String washCarAdvise = index1.getWString("des");// 洗车建议
+			String coldAdvise = index2.getWString("des");// 感冒建议
+			String sportsAdvise = index3.getWString("des");// 运动建议
+			String ultravioletRaysAdvise = index4.getWString("des");// 紫外线建议
 			weatherInf.setDressAdvise(dressAdvise);
 			weatherInf.setWashCarAdvise(washCarAdvise);
 			weatherInf.setColdAdvise(coldAdvise);
 			weatherInf.setSportsAdvise(sportsAdvise);
 			weatherInf.setUltravioletRaysAdvise(ultravioletRaysAdvise);
 
-		} catch (JSONException jsonExp) {
+		} catch (Exception jsonExp) {
 
 			weatherInf.setDressAdvise("要温度，也要风度。天热缓减衣，天凉及添衣！");
 			weatherInf.setWashCarAdvise("你洗还是不洗，灰尘都在哪里，不增不减。");
@@ -121,7 +121,7 @@ public class WeatherUtilOfBaidu {
 			weatherInf.setUltravioletRaysAdvise("心灵可以永远年轻，皮肤也一样可以！");
 		}
 
-		JSONArray weather_data = results0.getJSONArray("weather_data");
+		JsonArray weather_data = results0.getJsonArray("weather_data");
 
 		WeatherOfOneDay[] oneDayWeatherInfS = new WeatherOfOneDay[4];
 		for (int i = 0; i < 4; i++) {
@@ -130,8 +130,8 @@ public class WeatherUtilOfBaidu {
 
 		for (int i = 0; i < weather_data.size(); i++) {
 
-			JSONObject OneDayWeatherinfo = weather_data.getJSONObject(i);
-			String dayData = OneDayWeatherinfo.getString("date");
+			JsonObject OneDayWeatherinfo = weather_data.getJsonObject(i);
+			String dayData = OneDayWeatherinfo.getWString("date");
 			WeatherOfOneDay oneDayWeatherInf = new WeatherOfOneDay();
 
 			oneDayWeatherInf.setDate((today.getYear() + 1900) + "."
@@ -148,21 +148,21 @@ public class WeatherUtilOfBaidu {
 					oneDayWeatherInf.setTempertureNow(dayData.substring(
 							beginIndex + 1, endIndex));
 					oneDayWeatherInf.setWeek(OneDayWeatherinfo
-							.getString("date").substring(0, 2));
+							.getWString("date").substring(0, 2));
 				} else {
 					oneDayWeatherInf.setTempertureNow(" ");
 					oneDayWeatherInf.setWeek(OneDayWeatherinfo
-							.getString("date").substring(0, 2));
+							.getWString("date").substring(0, 2));
 				}
 
 			} else {
-				oneDayWeatherInf.setWeek(OneDayWeatherinfo.getString("date"));
+				oneDayWeatherInf.setWeek(OneDayWeatherinfo.getWString("date"));
 			}
 
 			oneDayWeatherInf.setTempertureOfDay(OneDayWeatherinfo
-					.getString("temperature"));
-			oneDayWeatherInf.setWeather(OneDayWeatherinfo.getString("weather"));
-			oneDayWeatherInf.setWind(OneDayWeatherinfo.getString("wind"));
+					.getWString("temperature"));
+			oneDayWeatherInf.setWeather(OneDayWeatherinfo.getWString("weather"));
+			oneDayWeatherInf.setWind(OneDayWeatherinfo.getWString("wind"));
 
 			oneDayWeatherInfS[i] = oneDayWeatherInf;
 		}

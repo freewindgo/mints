@@ -1,4 +1,4 @@
-package com.mints.authority;
+package com.mints.authority.controller;
 
 public class Test {
 	public static void main(String[] args) {

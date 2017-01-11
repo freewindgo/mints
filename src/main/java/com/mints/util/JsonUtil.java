@@ -1,194 +1,115 @@
-package com.lingnet.util;
+package com.mints.util;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import flexjson.JSONSerializer;
-import flexjson.transformer.DateTransformer;
+import link.jfire.codejson.JsonTool;
 
+/**
+ * Json工具类，主要使用Jackson进行解析，并加入codeJson解析方法
+ * 
+ * @author Justin
+ * @date 2017年1月9日
+ */
 
 public class JsonUtil {
-	// jackson ObjectMapper Bean名称
-	private static final String JACKSON_OBJECT_MAPPER_BEAN_NAME = "jacksonObjectMapper";
+	private static final Logger log = LogManager.getLogger(JsonUtil.class.getName());
 
 	public static ObjectMapper getMapper() {
-        ObjectMapper mapper = (ObjectMapper) SpringUtil
-                .getBean(JACKSON_OBJECT_MAPPER_BEAN_NAME);
-        mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        return mapper;
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		return mapper;
 	}
 
-	// 将对象转换为JSON字符串
+	/**
+	 * 对象转JSON
+	 * 
+	 * @param object
+	 * @return
+	 */
 	public static String toJson(Object object) {
 		ObjectMapper mapper = getMapper();
 		try {
 			return mapper.writeValueAsString(object);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			log.error("JsonUtil.toJson(Object object):" + e);
 			return null;
 		}
+
 	}
 
-	// 将JSON字符串转换为对象
+	/**
+	 * JSON转对象,如果输入class为List.class，则转换成List<Map>格式
+	 * 
+	 * @param json
+	 * @param clazz
+	 * @return
+	 */
 	public static <T> T toObject(String json, Class<T> clazz) {
 		ObjectMapper mapper = getMapper();
 		try {
 			return mapper.readValue(json, clazz);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			log.error("JsonUtil.toObject(String json, Class<T> clazz):" + e);
 			return null;
 		}
+
 	}
 
-	// 将JSON字符串转换为对象
-	public static <T> T toObject(String json, TypeReference<Object> typeReference)
-			throws JsonParseException, JsonMappingException, IOException {
-		ObjectMapper mapper = getMapper();
-		return mapper.readValue(json, typeReference);
-	}
 	/**
-     *@description:  根据给定json串解析出内部属性
-     *@param json串
-     *@return 属性Map
-     */
-    @SuppressWarnings("static-access")
-    public static Map<String,String> parseProperties(String jsonStr){
-        if(jsonStr ==null || jsonStr.length()<0){
-            return null;
-        }
-        JSONObject jsonObj = null;
-        Map<String, String> pros = new HashMap<String, String>();
-        try {
-            jsonObj = new JSONObject().fromObject(jsonStr);
-            
-            @SuppressWarnings ( "rawtypes" )
-            Iterator it = jsonObj.keys();
-            while(it.hasNext()){
-                String key = it.next().toString();
-                String value = jsonObj.getString(key);
-                pros.put(key, value);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return pros;
-    }
-    
-    
-    public static String Encode(Object obj) {
-        if(obj == null || obj.toString().equals("null")) return null;
-        if(obj != null && obj.getClass() == String.class){
-            return obj.toString();
-        }
-        JSONSerializer serializer = new JSONSerializer();
-        //serializer.transform(new DateTransformer("yyyy-MM-dd'T'HH:mm:ss"), Date.class);
-        //serializer.transform(new DateTransformer("yyyy-MM-dd'T'HH:mm:ss"), Timestamp.class);
-        return serializer.deepSerialize(obj);
-    }
-    
-    public static String Encode(Object obj, String format) {
-        if(obj == null || obj.toString().equals("null")) return null;
-        if(obj != null && obj.getClass() == String.class){
-            return obj.toString();
-        }
-        
-        JSONSerializer serializer = new JSONSerializer();
-        if (format != null && format.trim().length() > 0) {
-        	//serializer.transform(new DateTransformer("yyyy-MM-dd'T'HH:mm:ss"), Date.class);
-            serializer.transform(new DateTransformer(format), Timestamp.class);
-        }
-        
-        return serializer.deepSerialize(obj);
-    }
-    
-	public static List<Map<String, String>> getMapList(String jsonStr) {
-		if (jsonStr == null || jsonStr.length() < 0) {
+	 * JSON转对象，如果需要转为List或复杂泛型等格式可使用此种方式
+	 * 
+	 * @param json
+	 * @param typeReference
+	 * @return
+	 * 
+	 */
+	public static <T> T toObject(String json, TypeReference<Object> typeReference) {
+		ObjectMapper mapper = getMapper();
+		try {
+			return mapper.readValue(json, typeReference);
+		} catch (IOException e) {
+			log.error("JsonUtil.toObject(String json, TypeReference<Object> typeReference)):" + e);
 			return null;
 		}
-		JSONArray array = JSONArray.fromObject(jsonStr);
-		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
-		for (Iterator iter = array.iterator(); iter.hasNext();) {
-			Map<String, String> pros = new HashMap<String, String>();
-			JSONObject jsonObj = (JSONObject) iter.next();
-
-			Iterator it = jsonObj.keys();
-			while (it.hasNext()) {
-				String key = it.next().toString();
-				String value = jsonObj.getString(key);
-				if(value != null && !"null".equals(value.toLowerCase())) {
-					pros.put(key, value);
-				}
-			}
-			list.add(pros);
-		}
-		return list;
 	}
-    
-	public static Map<String, Map<String, String>> getMapByField(String jsonStr, String field) {
-		if (jsonStr == null || jsonStr.length() < 0) {
+
+	/**
+	 * 对象转JSON，使用codeJson，性能极佳，正确性待测
+	 * 
+	 * @param object
+	 * @return
+	 */
+	public static String toJsonByCodeJson(Object object) {
+		try {
+			return JsonTool.write(object);
+		} catch (Exception e) {
+			log.error("JsonUtil.toJsonByCodeJson(Object object):" + e);
 			return null;
 		}
-		JSONArray array = JSONArray.fromObject(jsonStr);
-		Map<String, Map<String, String>> map = new HashMap<String, Map<String, String>>();
-		for (Iterator iter = array.iterator(); iter.hasNext();) {
-			String fieldValue = "";
-			Map<String, String> pros = new HashMap<String, String>();
-			JSONObject jsonObj = (JSONObject) iter.next();
-
-			Iterator it = jsonObj.keys();
-			while (it.hasNext()) {
-				String key = it.next().toString();
-				String value = jsonObj.getString(key);
-				if(value != null && !"null".equals(value.toLowerCase())) {
-					pros.put(key, value);
-				}
-				if(key.equals(field)) {
-					fieldValue = value;
-				}
-			}
-			map.put(fieldValue, pros);
-		}
-		return map;
 	}
-	/*日期转换
-	 * 马晓鹏增加 */
-	 public static Date dateEncode(String obj,String type) {
-		 Date date=new Date();
-	        if(obj == null || obj.toString().equals("null") ||obj.toString().equals("")) return null;
-	        if(obj != null && obj.getClass() == String.class){
-	        	SimpleDateFormat sdf=new SimpleDateFormat(type);
-	        	try {
-					date=sdf.parse(obj);
-				} catch (ParseException e) { 
-					e.printStackTrace();
-				}
-	            return date;
-	        }else{
-	        	return null;
-	        } 
-	       
-	    }
-	 
-	 
-	 
-	
-     
+
+	/**
+	 * JSON转对象，使用codeJson，性能极佳，正确性待测
+	 * 
+	 * @param json
+	 * @param clazz
+	 * @return
+	 */
+	public static <T> T toObjectByCodeJson(String json, Class<T> clazz) {
+		try {
+			return JsonTool.read(clazz, json);
+		} catch (Exception e) {
+			log.error("JtoObjectByCodeJson(String json, Class<T> clazz):" + e);
+			return null;
+		}
+	}
+
 }

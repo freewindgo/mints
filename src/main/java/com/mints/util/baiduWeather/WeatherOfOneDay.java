@@ -1,4 +1,4 @@
-package com.mints.util.weather;
+package com.mints.util.baiduWeather;
 
 /**
  * 存储一天的天气信息
