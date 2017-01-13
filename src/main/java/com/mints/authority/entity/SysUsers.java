@@ -1,53 +1,26 @@
-package com.mints;
+package com.mints.authority.entity;
 
 import java.util.Date;
+import java.util.Set;
 
-public class SysUsers {
-    private String id;
+import com.mints.base.BaseEntity;
 
-    private Date createDate;
-
-    private Date modifyDate;
-
+/**
+ * 用户实体类
+ * @author Justin
+ * @date 2017年1月12日
+ */
+public class SysUsers extends BaseEntity{
+   
     private String username;
-
     private String password;
-
     private String name;
-
     private String depId;
-
     private Date loginDate;
-
     private String loginIp;
-
     private String isValid;
-
     private String status;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-
-    public Date getModifyDate() {
-        return modifyDate;
-    }
-
-    public void setModifyDate(Date modifyDate) {
-        this.modifyDate = modifyDate;
-    }
+    private Set<SysRoles> sysRoles;
 
     public String getUsername() {
         return username;
@@ -112,4 +85,12 @@ public class SysUsers {
     public void setStatus(String status) {
         this.status = status;
     }
+
+	public Set<SysRoles> getSysRoles() {
+		return sysRoles;
+	}
+
+	public void setSysRoles(Set<SysRoles> sysRoles) {
+		this.sysRoles = sysRoles;
+	}
 }

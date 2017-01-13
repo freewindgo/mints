@@ -54,10 +54,12 @@
 	</bean>
 
 	<!-- 配置Mybatis与Spring整合 -->
-	<bean id="sessionFactory" class="org.mybatis.spring.SqlSessionfactoryBean">
+	<bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="dataSource"></property>
 		<!-- 自动扫描mapping.xml文件 -->
-		<property name="mapperLocation" value="classpath:mybatis/*.xml"></property>
+		<property name="mapperLocations" value="classpath:mybatis/*Mapper.xml"></property>
+		<!-- 增加mybaitis配置文件，用于配置别名等 -->
+		<property name="configLocation" value="classpath:mybatis/mybatis-config.xml"></property>
 	</bean>
 
 	<!-- 配置Mabatis的Dao扫描,如果使用了多数据源，需配置SqlSessionFactory -->

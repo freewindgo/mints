@@ -3,11 +3,11 @@
     status : 这个用于设置log4j2自身内部的信息输出,可以不设置,当设置成trace时,会看到log4j2内部各种详细输出
     monitorInterval : Log4j能够自动检测修改配置文件和重新配置本身, 设置间隔秒数。
 -->
-<Configuration status="WARN" monitorInterval="600">
+<configuration status="WARN" monitorInterval="600">
 	
     <Properties>
         <!-- 配置日志文件输出目录 -->
-        <Property name="LOG_HOME">${webName.root}/WEB-INF/logs</Property>
+        <Property name="LOG_HOME">F:\mints\logs</Property>
     </Properties>
 
     <Appenders>
@@ -88,6 +88,6 @@
 
     </Loggers>
 
-</Configuration>
+</configuration>
 
 <!-- 日志级别 log4j规定了默认的几个级别：trace<debug<info<warn<error<fatal 详细参考http://blog.csdn.net/freewindgo/article/details/54092588-->

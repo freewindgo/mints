@@ -8,7 +8,7 @@ import java.util.List;
  * @author Justin
  * @date 2017年1月11日
  */
-public class BaseCriteria {
+public class BaseExample {
 	
     protected String orderByClause;//排序
 
@@ -17,7 +17,7 @@ public class BaseCriteria {
     protected List<Criteria> oredCriteria;//'或者'条件集合，其他的各个条件
 
     //构造函数
-    public BaseCriteria() {
+    public BaseExample() {
         oredCriteria = new ArrayList<Criteria>();
     }
 

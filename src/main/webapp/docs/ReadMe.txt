@@ -2,8 +2,8 @@
 1、VC层——Spring SpringMVC 4.1.6.RELEASE
 2、M层——Mybatis 3.3.1
 3、日志——log4j2.5
-4、权限控制——Spring Security 3.2.3.RELEASE
-5、数据连接池——阿里Druid1.0.27
+4、权限控制——Shiro 1.3.2
+5、数据连接池——阿里 Druid1.0.27
 6、数据库——Mysql
 7、前端框架——bootstrap
 8、表单处理——jqGrid
